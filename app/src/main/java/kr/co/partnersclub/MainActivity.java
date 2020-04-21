@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,12 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,18 +20,22 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.JavascriptInterface;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -53,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private String SERVER_URL = "https://partnersclub.co.kr";
     private WebView mWebView;
     private LinearLayout mMenuBar;
+
     private Context mContext;
     private String mToken = "";
     private SharedPreferences mPrefs = null;
@@ -64,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
     public final static int FILECHOOSER_LOLLIPOP_REQ_CODE = 2002;
     private Uri cameraImageUri = null;
 
-    private int mShowMenu = 0;
-
     private static final String TAG = "MainActivity";
 
     @Override
@@ -73,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
         mContext = MainActivity.this;
 
         super.onCreate(savedInstanceState);
-
-        checkVerify();
-
         setContentView(R.layout.activity_main);
 
+        checkVerify(); // 카메라, 내부스토리지 및 권한 확인
+
+        // 정보를 쉽게 불러오거나 저장하는 것을 도와주는 메소드 : getSharedPreferences
         mPrefs = getSharedPreferences("kr.co.partnersclub", MODE_PRIVATE);
 
         if (!isConnected()) {
@@ -96,9 +92,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            CookieSyncManager.createInstance(this);
+            CookieManager.getInstance().flush();
         }
 
+        // 서버에서 일괄적으로 보내는 메세지를 받기 위한 topic 방법
+        // onCreate 메소드 안에서 사용
         FirebaseMessaging.getInstance().subscribeToTopic("ALL");
 
         mMenuBar = findViewById(R.id.menubar);
@@ -106,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
+        // WebSettings webSettings=mWebView.getSetting(); 이렇게 설정할 수도 있음
+        // webSettings.setJavaScriptEnabled(true); 이런 식으로
+
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setSupportMultipleWindows(true);
         mWebView.addJavascriptInterface(new WebkitJavascriptInterface(mContext), "app");
@@ -132,10 +133,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 CookieManager.getInstance().flush();
+                // 동기화
             }
         });
 
         mWebView.setWebChromeClient(new WebChromeClient() {
+            // 확인 팝업 창
             @Override
             public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
                 AlertDialog dialog = new AlertDialog.Builder(view.getContext()).
@@ -152,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
+            // 선택 팝업 창
             @Override
             public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
                 new AlertDialog.Builder(view.getContext())
@@ -193,10 +197,12 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
+            // 사용자에게 해당 메소드는 특정 버전을 지원해야 한다 라고 알려줌
+            // (targetApi도 있는데 이건 그냥 IDE에게 이 메소드가 특정 버전을 지원한다는 것만 알려줌
+            // 코드에서는 오류가 안나는데 컴파일 시 버전이 낮으면 NoClassDefFoundError 오류가 날 수 있음
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            public boolean onShowFileChooser(
-                    WebView webView, ValueCallback<Uri[]> filePathCallback,
-                    FileChooserParams fileChooserParams) {
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback,
+                                             FileChooserParams fileChooserParams) {
                 // Callback 초기화 (중요!)
                 if (filePathCallbackLollipop != null) {
                     filePathCallbackLollipop.onReceiveValue(null);
@@ -218,22 +224,21 @@ public class MainActivity extends AppCompatActivity {
             mWebView.loadUrl(SERVER_URL);
         }
 
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            return;
-                        }
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (!task.isSuccessful()) {
+                    return;
+                }
 
-                        mToken = task.getResult().getToken();
-                        Log.d(TAG, "Token is " + mToken);
-                    }
-                });
+                mToken = task.getResult().getToken();
+                Log.d(TAG, "Token is " + mToken);
+            }
+        });
     }
 
     private void runCamera(boolean _isCapture) {
-        if (!_isCapture) {// 갤러리 띄운다.
+        if (!_isCapture) { // 갤러리 띄운다.
             Intent pickIntent = new Intent(Intent.ACTION_PICK);
             pickIntent.setType(MediaStore.Images.Media.CONTENT_TYPE);
             pickIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -283,7 +288,8 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case FILECHOOSER_NORMAL_REQ_CODE:
                 if (resultCode == RESULT_OK) {
-                    if (filePathCallbackNormal == null) return;
+                    if (filePathCallbackNormal == null)
+                        return;
                     Uri result = (data == null || resultCode != RESULT_OK) ? null : data.getData();
                     filePathCallbackNormal.onReceiveValue(result);
                     filePathCallbackNormal = null;
@@ -345,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.action_home:
+                // 이부분 Webview의 addJavascriptInterface 메소드 사용해서 바꿔보기
                 mWebView.loadUrl(SERVER_URL + "/index.do");
                 break;
             case R.id.action_mypage:
@@ -356,6 +363,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_menu:
                 hideKeyboard(MainActivity.this);
                 mWebView.evaluateJavascript("showMenu();", null);
+//                mWebView.evaluateJavascript("showMenu();", new ValueCallback<String>() {
+//                    @Override
+//                    public void onReceiveValue(String value) {
+//                        Log.i("onReceiveValue", value);
+//                    }
+//                });
+                // ios는 이게 안됨, 호출하는 함수, 값을 리턴하는 함수 두 개 필요
+                // 안드로이드는 리턴 값이 있는 함수의 호출과, 리턴 값을 가져오는 것이 한번에 가능(kitkat(19) 이상)
                 break;
         }
     }
@@ -377,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
                 .create();
     }
 
+    // 핸드폰의 뒤로가기 버튼 눌렀을때(위의 메소드 호출)
     @Override
     public void onBackPressed() {
         askQuit().show();
@@ -395,9 +411,10 @@ public class MainActivity extends AppCompatActivity {
             mContext = context;
         }
 
+        // 데이터 주고 받기
         @JavascriptInterface
         public void showMenuBar(final boolean show) {
-            mShowMenu = show ? 1 : 2;
+            int mShowMenu = show ? 1 : 2;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -420,6 +437,7 @@ public class MainActivity extends AppCompatActivity {
         public boolean getNotification() {
             return mPrefs.getBoolean("noti", true);
         }
+
 
         @JavascriptInterface
         public void setNotification(boolean show) {
