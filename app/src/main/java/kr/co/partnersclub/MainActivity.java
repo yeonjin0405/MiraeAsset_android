@@ -106,12 +106,13 @@ public class MainActivity extends AppCompatActivity {
 
         mMenuBar = findViewById(R.id.menubar);
         mWebView = findViewById(R.id.webview);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
+
         // WebSettings webSettings=mWebView.getSetting(); 이렇게 설정할 수도 있음
         // webSettings.setJavaScriptEnabled(true); 이런 식으로
-
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setSupportMultipleWindows(true);
         mWebView.addJavascriptInterface(new WebkitJavascriptInterface(mContext), "app");
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                         setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                //do nothing
+                                //do nothing, 확인 버튼 누르기만 함 -> 아래 confirm 됨
                             }
                         }).create();
                 dialog.show();
