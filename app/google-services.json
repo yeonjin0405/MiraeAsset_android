@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "488062888788",
+    "firebase_url": "https://partnersclub-fcaf3.firebaseio.com",
+    "project_id": "partnersclub-fcaf3",
+    "storage_bucket": "partnersclub-fcaf3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488062888788:android:060c03e21d2c2002",
+        "android_client_info": {
+          "package_name": "kr.co.partnersclub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488062888788-p7e1ishhu59uhtd44i9g79phi6ksftke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBu-fHvrB_Hr-LlULTUToFQnjZU-X9VSGM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488062888788-p7e1ishhu59uhtd44i9g79phi6ksftke.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "488062888788-u4hn8n3sgsjmfdev93fn8h3ujkhpt2sg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kr.co.partnersclub"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

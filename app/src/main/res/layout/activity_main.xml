@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_above="@id/menubar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </WebView>
+
+    <LinearLayout
+        android:id="@+id/menubar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/menubar_background"
+        android:paddingTop="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/action_home"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:onClick="onClick"
+            android:text="홈"
+            android:textColor="#898989"
+            android:drawableTop="@drawable/icon_m1" />
+        <Button
+            android:id="@+id/action_mypage"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:onClick="onClick"
+            android:text="마이페이지"
+            android:textColor="#898989"
+            android:drawableTop="@drawable/icon_m2" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/action_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="onClick"
+                android:text="알림"
+                android:textColor="#898989"
+                android:drawableTop="@drawable/icon_m3" />
+
+            <TextView
+                android:id="@+id/action_notice_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/roounded"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="12dip"
+                android:visibility="invisible" />
+        </FrameLayout>
+        <Button
+            android:id="@+id/action_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:onClick="onClick"
+            android:text="메뉴"
+            android:textColor="#898989"
+            android:drawableTop="@drawable/icon_m4" />
+
+    </LinearLayout>
+
+</RelativeLayout>

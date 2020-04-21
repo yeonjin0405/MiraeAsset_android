@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0b2c4d"
+    tools:context="kr.co.partnersclub.MainActivity">
+
+    <LinearLayout
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:paddingBottom="150dp"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:src="@drawable/logo"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textColor="#FFFFFF"
+            android:textAlignment="center"
+            android:text="파트너스 클럽이란 대한민국 강소기업과\n미래에셋대우의 협업 비즈니스 모델입니다."/>
+
+        <com.trncic.library.DottedProgressBar
+            android:id="@+id/progress"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:padding="30dp"
+            app:activeDot="@drawable/progress_dot_1"
+            app:dotSize="15dp"
+            app:inactiveDot="@drawable/progress_dot_2"
+            app:jumpingSpeed="300"
+            app:spacing="15dp" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>
